@@ -10,9 +10,11 @@ import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
-import { getRoomDetails, addRoomOption, removeRoomOption, startRoomVoting } from "../../../actions/rooms"
-import { logout } from "../../../actions/auth"
+// import { getRoomDetails, addRoomOption, removeRoomOption, startRoomVoting } from "../../../actions/room"
+// import { logout } from "@/actions/auth"
 import type { Option, Participant } from "@/lib/models"
+import { logout } from "@/app/actions/auth"
+import { addRoomOption, getRoomDetails, removeRoomOption, startRoomVoting } from "@/app/actions/rooms"
 
 export default function RoomLobbyPage({ params }: { params: { id: string } }) {
   const router = useRouter()

@@ -17,7 +17,9 @@ export async function signUp(formData: FormData) {
     const userId = await createUser({ name, email, password })
 
     // Set session cookie
-    cookies().set("userId", userId.toString(), {
+    ;(await
+      // Set session cookie
+      cookies()).set("userId", userId.toString(), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24 * 7, // 1 week
@@ -46,7 +48,9 @@ export async function login(formData: FormData) {
     }
 
     // Set session cookie
-    cookies().set("userId", user._id!.toString(), {
+    (await
+      // Set session cookie
+      cookies()).set("userId", user._id!.toString(), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24 * 7, // 1 week
@@ -60,12 +64,12 @@ export async function login(formData: FormData) {
 }
 
 export async function logout() {
-  cookies().delete("userId")
+  (await cookies()).delete("userId")
   redirect("/")
 }
 
 export async function getCurrentUser() {
-  const userId = cookies().get("userId")?.value
+  const userId = (await cookies()).get("userId")?.value
 
   if (!userId) {
     return null

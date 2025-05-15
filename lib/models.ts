@@ -31,6 +31,7 @@ export interface Option {
 }
 
 export interface Participant {
+  name: ReactNode
   _id?: ObjectId
   roomId: ObjectId | string
   userId: ObjectId | string

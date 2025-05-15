@@ -54,12 +54,12 @@ export default function ResultsPage({ params }: { params: { id: string } }) {
             router.push(`/room/${roomCode}/vote`)
           } else if (result.room?.status === "completed") {
             // Room is already completed, set the winner
-            setWinner(result.options.find((o) => o.text === result.room?.finalDecision)?._id?.toString() || null)
+            setWinner((result.options ?? []).find((o) => o.text === result.room?.finalDecision)?._id?.toString() || null)
             setTiebreakerType(result.room?.tiebreaker || null)
             setShowConfetti(true)
           } else {
             // Check for tie
-            checkForTie(result.options)
+            checkForTie(result.options || [])
           }
         } else {
           toast({

@@ -12,7 +12,11 @@ import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
 import { getRoomDetails, submitVote } from "../../../actions/rooms"
 import { logout } from "../../../actions/auth"
-import type { Option, Participant } from "@/lib/models"
+import type { Option, Participant as BaseParticipant } from "@/lib/models"
+
+interface Participant extends BaseParticipant {
+  username: string; // Add username property to the Participant type
+}
 
 export default function VotingPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -37,15 +41,20 @@ export default function VotingPage({ params }: { params: { id: string } }) {
 
         if (result.success) {
           // Shuffle options
-          const shuffledOptions = [...result.options].sort(() => Math.random() - 0.5)
+          const shuffledOptions = [...(result.options ?? [])].sort(() => Math.random() - 0.5)
           setOptions(shuffledOptions || [])
-          setParticipants(result.participants || [])
+          setParticipants(
+            (result.participants || []).map((participant) => ({
+              ...participant,
+              username: participant.name || "Unknown", // Map 'name' to 'username' or use a default value
+            }))
+          )
           setRoomTitle(result.room?.title || "")
           setIsCreator(result.isCreator || false)
           setCurrentUserId(result.currentUserId || "")
 
           // Check if user has already voted
-          const currentParticipant = result.participants.find((p) => p.userId.toString() === result.currentUserId)
+          const currentParticipant = result.participants?.find((p) => p.userId.toString() === result.currentUserId)
           if (currentParticipant?.hasVoted) {
             setHasVoted(true)
           }
@@ -84,7 +93,12 @@ export default function VotingPage({ params }: { params: { id: string } }) {
         const result = await getRoomDetails(roomCode)
 
         if (result.success) {
-          setParticipants(result.participants || [])
+          setParticipants(
+            (result.participants || []).map((participant) => ({
+              ...participant,
+              username: participant.name || "Unknown", // Map 'name' to 'username' or use a default value
+            }))
+          )
 
           // If room is completed, redirect to results
           if (result.room?.status === "completed") {
@@ -152,7 +166,12 @@ export default function VotingPage({ params }: { params: { id: string } }) {
         // Refresh room details to update participant status
         const updatedRoom = await getRoomDetails(roomCode)
         if (updatedRoom.success) {
-          setParticipants(updatedRoom.participants || [])
+          setParticipants(
+            (updatedRoom.participants || []).map((participant) => ({
+              ...participant,
+              username: participant.name || "Unknown", // Map 'name' to 'username' or use a default value
+            }))
+          )
         }
       } else {
         toast({
@@ -296,17 +315,22 @@ export default function VotingPage({ params }: { params: { id: string } }) {
                 <div className="space-y-2">
                   {participants.map((participant) => (
                     <div
-                      key={participant._id?.toString()}
-                      className="flex items-center gap-3 p-2 rounded-md hover:bg-white/5"
-                    >
+                        key={participant._id?.toString()}
+                      >
+                        <Avatar>
+                          <AvatarFallback className="bg-purple-700 text-white">
+                            {participant.username.charAt(0) || "?"}
+                          </AvatarFallback>
+                        </Avatar>
+                    
                       <Avatar>
                         <AvatarFallback className="bg-purple-700 text-white">
-                          {participant.name?.charAt(0) || "?"}
+                          {participant.username?.charAt(0) || "?"}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium">{participant.name}</span>
+                          <span className="font-medium">{participant.username}</span>
                           {participant.userId.toString() === currentUserId && (
                             <Badge variant="outline" className="text-xs">
                               You

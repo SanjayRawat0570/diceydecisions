@@ -27,7 +27,7 @@ export default function DashboardPage() {
       try {
         const result = await getUserDecisionRooms()
         if (result.success) {
-          setPastDecisions(result.rooms)
+          setPastDecisions(result.rooms || [])
         } else {
           toast({
             title: "Error",
